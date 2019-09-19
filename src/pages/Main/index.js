@@ -11,6 +11,24 @@ export default class Main extends Component {
     loading: false,
   };
 
+  componentDidMount() {
+    const repositories = localStorage.getItem('repositories');
+
+    // Carrega os dados do localstorage
+    if (repositories) {
+      this.setState({ repositories: JSON.parse(repositories) });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    const { repositories } = this.state;
+
+    // Salva os dados do localstorage
+    if (prevState.repositories !== repositories) {
+      localStorage.setItem('repositories', JSON.stringify(repositories));
+    }
+  }
+
   handleInputCharge = e => {
     this.setState({ newRepo: e.target.value });
   };
