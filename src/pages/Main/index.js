@@ -12,6 +12,7 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    repoNotFound: false,
   };
 
   componentDidMount() {
@@ -33,7 +34,10 @@ export default class Main extends Component {
   }
 
   handleInputCharge = e => {
-    this.setState({ newRepo: e.target.value });
+    this.setState({
+      newRepo: e.target.value,
+      repoNotFound: false,
+    });
   };
 
   handleSubmit = async e => {
@@ -43,21 +47,28 @@ export default class Main extends Component {
 
     const { newRepo, repositories } = this.state;
 
-    const response = await api.get(`/repos/${newRepo}`);
+    try {
+      const response = await api.get(`/repos/${newRepo}`);
 
-    const data = {
-      name: response.data.full_name,
-    };
+      const data = {
+        name: response.data.full_name,
+      };
 
-    this.setState({
-      repositories: [...repositories, data],
-      newRepo: '',
-      loading: false,
-    });
+      this.setState({
+        repositories: [...repositories, data],
+        newRepo: '',
+        loading: false,
+      });
+    } catch (_) {
+      this.setState({
+        repoNotFound: true,
+        loading: false,
+      });
+    }
   };
 
   render() {
-    const { newRepo, loading, repositories } = this.state;
+    const { newRepo, loading, repositories, repoNotFound } = this.state;
 
     return (
       <Container>
@@ -70,6 +81,7 @@ export default class Main extends Component {
           <input
             type="text"
             placeholder="Insert a repository"
+            error={repoNotFound.toString()}
             value={newRepo}
             onChange={this.handleInputCharge}
           />
