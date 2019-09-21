@@ -6,7 +6,7 @@ import { FaAngleLeft, FaGithub } from 'react-icons/fa';
 import api from '../../services/api';
 import Container from '../../components/Container';
 
-import { Loading, Owner, IssuesList, Label } from './styles';
+import { Loading, Owner, IssuesList, Label, SearchMenu } from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -21,6 +21,7 @@ export default class Repository extends Component {
     repository: {},
     issues: [],
     loading: true,
+    menuSelect: 'all',
   };
 
   async componentDidMount() {
@@ -45,8 +46,28 @@ export default class Repository extends Component {
     });
   }
 
+  handleSearch = async e => {
+    const param = e.target.textContent.toLowerCase();
+
+    const { match } = this.props;
+
+    const repoName = decodeURIComponent(match.params.repository);
+
+    const issues = await api.get(`/repos/${repoName}/issues`, {
+      params: {
+        state: param,
+        per_page: 5,
+      },
+    });
+
+    this.setState({
+      issues: issues.data,
+      menuSelect: param,
+    });
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, menuSelect } = this.state;
 
     if (loading) {
       return (
@@ -67,6 +88,30 @@ export default class Repository extends Component {
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
         </Owner>
+
+        <SearchMenu>
+          <button
+            type="button"
+            select={menuSelect === 'all' ? 1 : null}
+            onClick={this.handleSearch}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            select={menuSelect === 'open' ? 1 : null}
+            onClick={this.handleSearch}
+          >
+            Open
+          </button>
+          <button
+            type="button"
+            select={menuSelect === 'closed' ? 1 : null}
+            onClick={this.handleSearch}
+          >
+            Closed
+          </button>
+        </SearchMenu>
 
         <IssuesList>
           {issues.map(issue => (

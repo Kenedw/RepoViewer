@@ -122,3 +122,25 @@ export const Label = styled.span.attrs(props => ({
   padding: 3px 4px;
   margin-left: 10px;
 `;
+
+export const SearchMenu = styled.div`
+  display: flex;
+  justify-content: center;
+
+  button {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 16px;
+
+    &[select] {
+      background: green;
+      color: white;
+    }
+
+    & + button {
+      margin-left: 10px;
+    }
+  }
+`;
