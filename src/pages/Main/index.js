@@ -54,12 +54,22 @@ export default class Main extends Component {
         name: response.data.full_name,
       };
 
+      const isExist = repositories.some(
+        repository => repository.name === data.name
+      );
+
+      if (isExist) {
+        throw new Error('Repository already exist');
+      }
+
       this.setState({
         repositories: [...repositories, data],
         newRepo: '',
         loading: false,
       });
-    } catch (_) {
+    } catch (e) {
+      console.error(e);
+
       this.setState({
         repoNotFound: true,
         loading: false,

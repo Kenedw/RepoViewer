@@ -69,6 +69,7 @@ export const List = styled.ul`
     a {
       color: #615f69;
       text-decoration: none;
+      cursor: pointer;
     }
   }
 `;
