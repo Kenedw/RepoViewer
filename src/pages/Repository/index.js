@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { FaAngleLeft, FaGithub } from 'react-icons/fa';
+import {
+  FaAngleLeft,
+  FaGithub,
+  FaArrowRight,
+  FaArrowLeft,
+} from 'react-icons/fa';
 
 import api from '../../services/api';
 import Container from '../../components/Container';
 
-import { Loading, Owner, IssuesList, Label, SearchMenu } from './styles';
+import {
+  Loading,
+  Owner,
+  IssuesList,
+  Label,
+  SearchMenu,
+  Pagenation,
+} from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -22,6 +34,7 @@ export default class Repository extends Component {
     issues: [],
     loading: true,
     menuSelect: 'all',
+    page: 1,
   };
 
   async componentDidMount() {
@@ -46,6 +59,29 @@ export default class Repository extends Component {
     });
   }
 
+  async componentDidUpdate(_, prevState) {
+    const { page, param } = this.state;
+
+    if (page !== prevState.page) {
+      const { match } = this.props;
+
+      const repoName = decodeURIComponent(match.params.repository);
+
+      const issues = await api.get(`/repos/${repoName}/issues`, {
+        params: {
+          state: param,
+          per_page: 5,
+          page,
+        },
+      });
+
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        issues: issues.data,
+      });
+    }
+  }
+
   handleSearch = async e => {
     const param = e.target.textContent.toLowerCase();
 
@@ -66,8 +102,28 @@ export default class Repository extends Component {
     });
   };
 
+  handlePreviousPage = () => {
+    let { page } = this.state;
+
+    page = page > 1 ? page - 1 : page;
+
+    this.setState({
+      page,
+    });
+  };
+
+  handleNextPage = () => {
+    let { page } = this.state;
+
+    page += 1;
+
+    this.setState({
+      page,
+    });
+  };
+
   render() {
-    const { repository, issues, loading, menuSelect } = this.state;
+    const { repository, issues, loading, menuSelect, page } = this.state;
 
     if (loading) {
       return (
@@ -131,6 +187,19 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssuesList>
+
+        <Pagenation>
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={this.handlePreviousPage}
+          >
+            <FaArrowLeft />
+          </button>
+          <button type="button" onClick={this.handleNextPage}>
+            <FaArrowRight />
+          </button>
+        </Pagenation>
       </Container>
     );
   }

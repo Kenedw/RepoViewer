@@ -144,3 +144,24 @@ export const SearchMenu = styled.div`
     }
   }
 `;
+
+export const Pagenation = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  button {
+    border: none;
+    background: none;
+
+    &[disabled] {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    svg {
+      width: 30px;
+      height: 30px;
+    }
+  }
+`;
